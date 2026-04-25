@@ -36,3 +36,6 @@ next-env.d.ts
 # Governance session tracking
 .claude/
 .claude-session-base
+
+# App data (classifications, etc.)
+data/
