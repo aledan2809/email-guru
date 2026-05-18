@@ -17,8 +17,10 @@ const KEY_LENGTH = 32;
 function getEncryptionKey(): Buffer {
   const envKey = process.env.ENCRYPTION_KEY;
   if (!envKey) {
-    logWarn('[Encryption] ENCRYPTION_KEY not set in .env.local - using default key (INSECURE)');
-    // Default key for development - NEVER use in production
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('[Encryption] ENCRYPTION_KEY must be set in production');
+    }
+    logWarn('[Encryption] ENCRYPTION_KEY not set - using dev fallback (INSECURE, dev only)');
     return crypto.scryptSync('default-dev-key-email-guru', 'salt', KEY_LENGTH);
   }
 
@@ -36,7 +38,7 @@ export function encrypt(plaintext: string): string {
     const key = getEncryptionKey();
     const iv = crypto.randomBytes(IV_LENGTH);
 
-    const cipher = crypto.createCipher(ALGORITHM, key.toString('hex'));
+    const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
     let encrypted = cipher.update(plaintext, 'utf8', 'base64');
     encrypted += cipher.final('base64');
 
@@ -61,8 +63,9 @@ export function decrypt(encrypted: string): string {
 
     const [ivB64, encryptedB64] = parts;
     const key = getEncryptionKey();
+    const iv = Buffer.from(ivB64, 'base64');
 
-    const decipher = crypto.createDecipher(ALGORITHM, key.toString('hex'));
+    const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
     let decrypted = decipher.update(encryptedB64, 'base64', 'utf8');
     decrypted += decipher.final('utf8');
 

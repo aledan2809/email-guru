@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import DOMPurify from 'isomorphic-dompurify';
 import {
   ArrowLeft, Star, Archive, Trash2, Reply, Forward,
   MoreVertical, Paperclip, Sparkles, Receipt, ChevronDown,
@@ -220,7 +221,7 @@ export function EmailView({
 
         <div className="prose prose-invert max-w-none">
           {email.bodyHtml ? (
-            <div dangerouslySetInnerHTML={{ __html: email.bodyHtml }} className="text-[var(--text-secondary)]" />
+            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(email.bodyHtml) }} className="text-[var(--text-secondary)]" />
           ) : (
             <pre className="whitespace-pre-wrap font-sans text-[var(--text-secondary)]">
               {email.bodyText || email.snippet}
