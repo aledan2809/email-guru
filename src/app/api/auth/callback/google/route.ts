@@ -40,6 +40,17 @@ export async function GET(request: NextRequest) {
         sameSite: 'lax',
         maxAge: 30 * 24 * 3600,
       });
+
+      // Persistăm și pe disc: rutina de triaj pornește fără browser, deci nu
+      // are cum să citească un cookie. Eșecul aici nu trebuie să rupă login-ul.
+      if (userInfo.email) {
+        try {
+          const { saveRefreshToken } = await import('@/lib/triage/token-store.mjs');
+          saveRefreshToken(userInfo.email, tokens.refresh_token, tokens.scope?.split(' '));
+        } catch (e) {
+          console.warn('[triaj] nu am putut salva autorizarea pe disc:', e);
+        }
+      }
     }
 
     cookieStore.set('gmail_user', JSON.stringify({

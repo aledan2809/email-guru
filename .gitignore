@@ -42,3 +42,10 @@ data/
 
 # Secret-rotation backups (.env*.bak-*-rotation) — keep on disk as rollback anchors, never track (forensic 2026-06-25)
 .env*.bak*
+
+# Triaj Gmail — date sensibile, nu intra in git
+data/gmail-tokens.json
+data/triage/
+
+# Rutina de triaj
+logs/

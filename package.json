@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "gmail:connect": "node scripts/gmail-connect.mjs",
+    "gmail:triage": "node scripts/gmail-triage.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.91.0",
