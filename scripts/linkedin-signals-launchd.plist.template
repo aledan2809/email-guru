@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Rutina de triaj Gmail — rulează în fiecare dimineață.
+
+  Ora e 07:23, nu 07:00: la fix pornesc și alte lucruri pe mașină (backup-uri,
+  sincronizări) și s-ar bate pe procesor cu modelul local.
+
+  Instalare:
+    cp scripts/linkedin-signals-launchd.plist.template ~/Library/LaunchAgents/com.emailguru.linkedin-signals.plist
+    launchctl load ~/Library/LaunchAgents/com.emailguru.linkedin-signals.plist
+
+  Pornire manuală (test):
+    launchctl start com.emailguru.linkedin-signals
+
+  Oprire / dezinstalare:
+    launchctl unload ~/Library/LaunchAgents/com.emailguru.linkedin-signals.plist
+
+  Verificare:
+    launchctl list | grep gmail-triage
+    tail -f "/Users/danciulescu/Projects/E-mail Guru/logs/gmail-triage.log"
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.emailguru.linkedin-signals</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>/Users/danciulescu/Projects/E-mail Guru/scripts/linkedin-signals-daily.sh</string>
+  </array>
+
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Hour</key><integer>7</integer>
+    <key>Minute</key><integer>40</integer>
+  </dict>
+
+  <!-- Dacă Mac-ul dormea la ora aceea, rulează la trezire. -->
+  <key>RunAtLoad</key>
+  <false/>
+
+  <key>StandardOutPath</key>
+  <string>/Users/danciulescu/Projects/E-mail Guru/logs/launchd.out.log</string>
+  <key>StandardErrorPath</key>
+  <string>/Users/danciulescu/Projects/E-mail Guru/logs/launchd.err.log</string>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/danciulescu/Projects/E-mail Guru</string>
+</dict>
+</plist>
