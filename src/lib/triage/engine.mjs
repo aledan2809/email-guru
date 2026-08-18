@@ -130,6 +130,22 @@ function domainMatches(domain, list) {
   return list.some((d) => domain === d || domain.endsWith(`.${d}`));
 }
 
+/**
+ * Orice autoritate de stat, oriunde.
+ *
+ * Prins pe cutia reală (2026-08-18): `no-reply@tax.gov.ae` — fiscul din Emirate,
+ * unde există o firmă — era propus spre SPAM. Mesajul era într-adevăr o reclamă
+ * la canalul lor de WhatsApp, dar filtrat ca spam, expeditorul ar fi luat cu el
+ * și notificările fiscale de mai târziu.
+ *
+ * O listă de domenii ar fi rămas mereu în urmă (azi Emiratele, mâine altceva),
+ * așa că ne uităm la structura numelui: o etichetă `gov` sau `guv` înseamnă
+ * administrație publică — tax.gov.ae, portal.gov.ro, irs.gov, hmrc.gov.uk.
+ */
+function isGovernmentDomain(domain) {
+  return domain.split('.').some((label) => label === 'gov' || label === 'guv');
+}
+
 function headerMap(payload) {
   return Object.fromEntries((payload?.headers || []).map((h) => [h.name.toLowerCase(), h.value]));
 }
@@ -217,6 +233,12 @@ function applySafetyNet(email, verdict) {
   if (REMOVES_FROM_INBOX.has(action) && domainMatches(domain, KEEP_IN_INBOX_DOMAINS)) {
     action = 'PASTREAZA';
     notes.push(`expeditor cu termene/bani (${domain}) — rămâne în inbox`);
+  }
+  if (DESTRUCTIVE.has(action) && isGovernmentDomain(domain)) {
+    // Poate fi arhivat dacă e o simplă informare, dar nu ajunge în spam:
+    // filtrat o dată, expeditorul ia cu el și notificările care contează.
+    action = 'ARHIVEAZA';
+    notes.push(`autoritate publică (${domain}) — arhivat, niciodată spam`);
   }
   if (DESTRUCTIVE.has(action) && domainMatches(domain, NEVER_DISCARD_DOMAINS)) {
     action = 'ARHIVEAZA';

@@ -83,6 +83,13 @@ const CASES = [
       subject: 'Contul dumneavoastra expira in 24 de ore',
       snippet: 'Termenul limita este azi. Confirmati datele cardului pentru a evita suspendarea.' }) },
 
+  // Prins pe cutia reală (2026-08-18): fiscul din Emirate propus spre SPAM.
+  // Mesajul chiar era o reclamă, dar expeditorul trimite și notificări fiscale.
+  { name: 'autoritate fiscală străină (reclamă, dar expeditor de păstrat)', mustNotBeDestructive: true,
+    email: mk({ id: 'c15', from: 'FTA Communication <no-reply@tax.gov.ae>',
+      subject: 'Join The Federal Tax Authority WhatsApp Channel',
+      snippet: 'Stay updated with the latest tax news by joining our official WhatsApp channel.' }) },
+
   { name: 'bancă adevărată (domeniu real) rămâne în inbox', mustStayInInbox: true,
     email: mk({ id: 'c10', from: 'notificari@bcr.ro', subject: 'Extras de cont disponibil',
       snippet: 'Extrasul de cont pentru luna iulie este disponibil in Internet Banking.' }) },
