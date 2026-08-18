@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "gmail:connect": "node scripts/gmail-connect.mjs",
-    "gmail:triage": "node scripts/gmail-triage.mjs"
+    "gmail:triage": "node scripts/gmail-triage.mjs",
+    "linkedin:signals": "node scripts/linkedin-signals.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.91.0",
