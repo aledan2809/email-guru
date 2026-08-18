@@ -78,12 +78,44 @@ const KEEP_IN_INBOX_DOMAINS = [
   'just.ro', 'portal.just.ro', 'onrc.ro',
   'bcr.ro', 'brd.ro', 'ing.ro', 'raiffeisen.ro', 'unicredit.ro',
   'revolut.com', 'stripe.com', 'bt.ro', 'bancatransilvania.ro',
+  // Contabilitate și furnizori care trimit facturi de plătit — prinse la prima
+  // rulare reală: „Pontajul pe luna trecută" și „Notificare de Plată" erau
+  // propuse spre arhivare.
+  'keez.ro', 'app.keez.ro', 'smartbill.ro', 'oblio.eu',
+  'hostico.ro', 'hostinger.com', 'hostinger.ro',
 ];
+
+// Cuvinte care spun „am un termen sau bani în joc".
+//
+// Potrivirea pe text m-a înșelat o dată (phishing-ul cu „bcr" în domeniu), deci
+// aici o folosim DOAR într-o direcție sigură: oprim arhivarea tăcută. Nu scoate
+// niciodată ceva din spam sau din coș, deci un fals pozitiv costă exact atât:
+// un email rămas în inbox.
+const DEADLINE_WORDS = [
+  'scadent', 'notificare de plat', 'de plată', 'de plata', 'pontaj', 'pontaj',
+  'restant', 'penalit', 'termen limit', 'termen de depunere', 'expiră', 'expira',
+  'factura ta', 'factură', 'payment due', 'invoice due', 'overdue', 'past due',
+  'renewal', 'se reînnoiește', 'declaraț',
+];
+
+function mentionsDeadline(email) {
+  const hay = `${email.subject} ${email.snippet}`.toLowerCase();
+  return DEADLINE_WORDS.some((w) => hay.includes(w));
+}
 
 /** Domenii care nu ajung niciodată în spam/coș, dar pot fi arhivate. */
 const NEVER_DISCARD_DOMAINS = [
   'github.com', 'google.com', 'accounts.google.com', 'apple.com',
   'microsoft.com', 'cloudflare.com', 'hostico.ro', 'hostinger.com',
+
+  // Propria infrastructură. Prins la prima rulare reală (2026-08-15): raportul
+  // zilnic al MarketingAutomation, de pe techbiz.ae, a fost propus spre SPAM cu
+  // încredere 1.0 — „reclamă de marketing", după nume. Dus acolo, Gmail ar fi
+  // învățat să filtreze propriile rapoarte de sistem, iar ele ar fi dispărut
+  // tăcut. Modelul nu are de unde ști care domenii sunt ale casei; i le spunem.
+  'techbiz.ae', '4pro.io', 'knowbest.ro', 'procuchain.com', 'blocx.ro',
+  '4updf.com', 'teinformez.eu', 'etutor.ro', 'consj.ro', 'utilajhub.ro',
+  'racex.ro', 'ave.techbiz.ae',
 ];
 
 function senderDomain(from) {
@@ -189,6 +221,12 @@ function applySafetyNet(email, verdict) {
   if (DESTRUCTIVE.has(action) && domainMatches(domain, NEVER_DISCARD_DOMAINS)) {
     action = 'ARHIVEAZA';
     notes.push(`furnizor de cont/securitate (${domain}) — arhivat, nu aruncat`);
+  }
+  // Oprim doar arhivarea. Dacă modelul a spus spam/coș, îl lăsăm — altfel un
+  // phishing care strigă „contul expiră" ar fi salvat exact de regula asta.
+  if (action === 'ARHIVEAZA' && mentionsDeadline(email)) {
+    action = 'PASTREAZA';
+    notes.push('pomenește un termen sau o plată — rămâne în inbox');
   }
   if (DESTRUCTIVE.has(action) && email.labels.includes('STARRED')) {
     action = 'PASTREAZA';

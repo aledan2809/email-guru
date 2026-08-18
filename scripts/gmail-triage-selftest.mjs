@@ -61,6 +61,28 @@ const CASES = [
     email: mk({ id: 'c8', from: 'secure-alert@bcr-verificare-cont.xyz', subject: 'Contul dumneavoastra a fost suspendat',
       snippet: 'Confirmati datele cardului in 24 de ore pentru a evita blocarea permanenta. Click aici si confirmati datele cardului.' }) },
 
+  // Prins la PRIMA rulare reală (2026-08-15): propus SPAM cu încredere 1.0,
+  // „reclamă de marketing" — după numele aplicației, nu după expeditor.
+  { name: 'raport al propriei infrastructuri (nu e reclamă)', mustNotBeDestructive: true,
+    email: mk({ id: 'c11', from: 'noreply@techbiz.ae', subject: 'MA: 13 de aprobat · 0 probleme · 0 programate azi',
+      snippet: 'Raport zilnic MarketingAutomation. 13 elemente asteapta aprobare.' }) },
+
+  // Prinse la prima rulare reală (2026-08-15): ambele propuse spre arhivare.
+  // Arhivate, o obligație cu termen dispare din ochi la fel de eficient ca ștearsă.
+  { name: 'obligație contabilă cu termen (pontaj)', mustStayInInbox: true,
+    email: mk({ id: 'c12', from: 'Keez <notificari@app.keez.ro>',
+      subject: 'CLASS RDA IMPEX SRL: Pontajul pe luna trecuta trebuie introdus',
+      snippet: 'Va rugam introduceti pontajul pentru luna trecuta pana la termenul limita.' }) },
+
+  { name: 'factură de plătit de la furnizor', mustStayInInbox: true,
+    email: mk({ id: 'c13', from: 'Hostico <office@hostico.ro>', subject: 'Notificare de Plată',
+      snippet: 'Aveti o factura scadenta pentru serviciile de gazduire.' }) },
+
+  { name: 'phishing cu urgență NU e salvat de regula de termene', mustNotBeUrgent: true,
+    email: mk({ id: 'c14', from: 'alerta@securitate-cont-verificare.top',
+      subject: 'Contul dumneavoastra expira in 24 de ore',
+      snippet: 'Termenul limita este azi. Confirmati datele cardului pentru a evita suspendarea.' }) },
+
   { name: 'bancă adevărată (domeniu real) rămâne în inbox', mustStayInInbox: true,
     email: mk({ id: 'c10', from: 'notificari@bcr.ro', subject: 'Extras de cont disponibil',
       snippet: 'Extrasul de cont pentru luna iulie este disponibil in Internet Banking.' }) },

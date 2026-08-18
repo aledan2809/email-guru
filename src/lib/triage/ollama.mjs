@@ -5,7 +5,12 @@
 
 const OLLAMA_URL = process.env.OLLAMA_URL || 'http://127.0.0.1:11434';
 
-export const MODEL = process.env.GMAIL_TRIAGE_MODEL || 'qwen2.5:32b';
+// Modelul implicit e cel pe care l-am verificat efectiv: llama3.1:8b trece
+// toate cele 14 cazuri golden și duce un inbox de 35 de mesaje în ~80 de
+// secunde. qwen2.5:32b judecă mai fin, dar e modelul pe care rulează și
+// mineritul de oportunități — pus implicit aici, cele două s-ar aștepta
+// reciproc. Îl alegi cu GMAIL_TRIAGE_MODEL când vrei judecata mai fină.
+export const MODEL = process.env.GMAIL_TRIAGE_MODEL || 'llama3.1:8b';
 
 function assertLocalOllama() {
   let host;
